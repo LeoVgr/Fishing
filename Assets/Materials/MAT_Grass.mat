@@ -73,6 +73,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Normal:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -89,6 +93,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: 2adf44a8d2274fb4bb10a1f416a5971b, type: 3}
         m_Scale: {x: 0.01, y: 0.01}
         m_Offset: {x: 0, y: 0}
+    - _WindNoiseTexture:
+        m_Texture: {fileID: 2800000, guid: 2adf44a8d2274fb4bb10a1f416a5971b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -104,6 +112,8 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaClip: 0
+    - _AlphaWindFrequency: 10
+    - _AlphaWindSpeed: 6
     - _BendDelta: 0.15
     - _BladeBendCurve: 4
     - _BladeBendDistance: 0.39
@@ -123,6 +133,7 @@ Material:
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
+    - _CutOff: 0.5
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
@@ -151,7 +162,13 @@ Material:
     - _TessellationEdgeLength: 0.25
     - _TessellationFactor: 4
     - _TessellationGrassDistance: 0.075
-    - _WindFrequency: 0.0125
+    - _WindAmplitude: 0.3
+    - _WindForce: 0.2
+    - _WindFrequency: 0.8
+    - _WindHeightFactor: 0.5
+    - _WindSinAmplitude: 0.3
+    - _WindSinFrequency: 0.3
+    - _WindSpeed: 10
     - _WindStrength: 0.5
     - _WorkflowMode: 1
     - _ZWrite: 1

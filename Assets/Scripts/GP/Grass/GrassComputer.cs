@@ -55,10 +55,13 @@ public class GrassComputer : MonoBehaviour
             {
                 var meshProperty = new MeshProperties();
                 var position = new Vector3(-start + idx * step, 0f, -start + idy * step) + new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f));
+                position.y = Terrain.activeTerrain.SampleHeight(position);
                 var rotation = Quaternion.Euler(0, Random.Range(0f, 360f), 0);
 
                 var scaleNoise = 1f;
-                var scale = new Vector3(1, Mathf.PerlinNoise(idx + 0.01f * scaleNoise, idy + 0.01f * scaleNoise) * 2f, 1);
+                var scaleAmplitude = 2f;
+                var scaleFactor = Mathf.PerlinNoise(idx + 0.01f * scaleNoise, idy + 0.01f * scaleNoise) * scaleAmplitude;
+                var scale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 
                 meshProperty.color = new Vector4(Random.Range(0f, 0.3f), 1f, Random.Range(0f, 0.3f), 1);
                 meshProperty.matrix = Matrix4x4.TRS(position, rotation, scale);

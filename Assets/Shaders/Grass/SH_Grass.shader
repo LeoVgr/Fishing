@@ -1,5 +1,14 @@
 Shader "Unlit/SH_Grass"
 {
+    Properties
+    {
+        _WindFrequency ("WindFrequency", Float) = 0.5
+        _WindAmplitude ("WindAmplitude", Float) = 0.5
+        _WindSinFrequency ("WindSinFrequency", Float) = 0.5
+        _WindSinAmplitude ("WindSinAmplitude", Float) = 0.5
+        _WindHeightFactor ("WindHeightFactor", Float) = 0.5
+        _WindNoiseTexture ("WindTexture", 2D) = "white"{}
+    }
     SubShader
     {
         Tags {"RenderType"="Opaque"}
@@ -35,6 +44,12 @@ Shader "Unlit/SH_Grass"
 				float4 color;
 			};
 
+            float _WindFrequency;
+            float _WindAmplitude;
+            float _WindSinAmplitude;
+            float _WindSinFrequency;
+            float _WindHeightFactor;
+            sampler2D _WindNoiseTexture;
 			StructuredBuffer<MeshProperties> _Properties;
             sampler2D _MainTex;
             float4 _MainTex_ST;
@@ -42,9 +57,20 @@ Shader "Unlit/SH_Grass"
             v2f vert (appdata v, uint instanceID: SV_InstanceID)
             {
                 v2f o;
+
+                // Register the height in object space to know which height is the vertex
+                // (used to not move bottom vertex in wind animation)
 				float height = v.vertex.y;
+
+                // Wind animation
 				float4 pos = mul(_Properties[instanceID].mat, v.vertex);
-				pos.x += sin(_Time * 10) * height;
+                
+                float posX = _Properties[instanceID].mat[0][0] * _Time * _WindFrequency;
+                float posZ = _Properties[instanceID].mat[0][2] * _Time * _WindFrequency;
+                float4 tex = tex2Dlod (_WindNoiseTexture, float4(posX,posZ,0,0));
+				pos.xz += (height * pow(2,_WindHeightFactor)) * ((tex.r+tex.g+tex.b) * _WindAmplitude);
+				pos.xz += height * sin((_Properties[instanceID].mat[0][0] + _Properties[instanceID].mat[0][2]) + _Time * _WindSinFrequency) * _WindSinAmplitude;
+
                 o.vertex = UnityObjectToClipPos(pos);
                 o.color = _Properties[instanceID].color;
                 UNITY_TRANSFER_FOG(o,o.vertex);
