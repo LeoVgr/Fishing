@@ -1,0 +1,4 @@
+#pragma kernel CS_ComputeGrass
+
+[numthreads(8, 8, 1)]
+void CS_ComputeGrass (uint3 id: SV_DispatchThreadID) {}

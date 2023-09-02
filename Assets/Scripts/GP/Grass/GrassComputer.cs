@@ -4,7 +4,6 @@ using UnityEngine;
 // MonoBehaviour is the base class from which every Unity script derives.
 public class GrassComputer : MonoBehaviour
 {
-
     public UnityEngine.Transform Player;
     public float Range;
     public int Density;
