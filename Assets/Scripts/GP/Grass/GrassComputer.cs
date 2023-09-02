@@ -4,6 +4,8 @@ using UnityEngine;
 // MonoBehaviour is the base class from which every Unity script derives.
 public class GrassComputer : MonoBehaviour
 {
+
+    public UnityEngine.Transform Player;
     public float Range;
     public int Density;
 
@@ -18,11 +20,10 @@ public class GrassComputer : MonoBehaviour
     private struct MeshProperties
     {
         public Matrix4x4 matrix;
-        public Vector4 color;
 
         public static int Size()
         {
-            return sizeof(float) * 16 + sizeof(float) * 4;
+            return sizeof(float) * 16;
         }
     }
 
@@ -58,12 +59,11 @@ public class GrassComputer : MonoBehaviour
                 position.y = Terrain.activeTerrain.SampleHeight(position);
                 var rotation = Quaternion.Euler(0, Random.Range(0f, 360f), 0);
 
-                var scaleNoise = 1f;
+                var scaleNoise = 3f;
                 var scaleAmplitude = 2f;
                 var scaleFactor = Mathf.PerlinNoise(idx + 0.01f * scaleNoise, idy + 0.01f * scaleNoise) * scaleAmplitude;
                 var scale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 
-                meshProperty.color = new Vector4(Random.Range(0f, 0.3f), 1f, Random.Range(0f, 0.3f), 1);
                 meshProperty.matrix = Matrix4x4.TRS(position, rotation, scale);
                 meshProperties[index] = meshProperty;
 
@@ -78,6 +78,7 @@ public class GrassComputer : MonoBehaviour
 
     public void Update()
     {
+        this.GrassMaterial.SetVector("_PlayerPos", new Vector4(this.Player.position.x, 0, this.Player.position.z, 0));
         Graphics.DrawMeshInstancedIndirect(this.GrassMesh, 0, this.GrassMaterial, this.bounds, this.argsBuffer);
     }
 

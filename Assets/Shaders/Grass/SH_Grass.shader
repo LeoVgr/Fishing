@@ -8,6 +8,11 @@ Shader "Unlit/SH_Grass"
         _WindSinAmplitude ("WindSinAmplitude", Float) = 0.5
         _WindHeightFactor ("WindHeightFactor", Float) = 0.5
         _WindNoiseTexture ("WindTexture", 2D) = "white"{}
+
+        _TopColor ("TopColor", Color) = (1,1,1,1)
+        _BotColor ("BotColor", Color) = (1,1,1,1)
+
+        _PlayerPos ("PlayerPos", Vector) = (0,0,0,0)
     }
     SubShader
     {
@@ -29,19 +34,19 @@ Shader "Unlit/SH_Grass"
             {
                 float4 vertex : POSITION;
 				fixed4 color : COLOR;
+                float4 texCoord : TEXCOORD0;
             };
 
             struct v2f
             {
                 UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
-				fixed4 color : COLOR;
+                float4 texCoord : TEXCOORD0;
             };
 
 			struct MeshProperties 
 			{
 				float4x4 mat;
-				float4 color;
 			};
 
             float _WindFrequency;
@@ -49,10 +54,13 @@ Shader "Unlit/SH_Grass"
             float _WindSinAmplitude;
             float _WindSinFrequency;
             float _WindHeightFactor;
+            fixed4 _TopColor;
+            fixed4 _BotColor;
             sampler2D _WindNoiseTexture;
 			StructuredBuffer<MeshProperties> _Properties;
             sampler2D _MainTex;
             float4 _MainTex_ST;
+            float4 _PlayerPos;
 
             v2f vert (appdata v, uint instanceID: SV_InstanceID)
             {
@@ -64,25 +72,30 @@ Shader "Unlit/SH_Grass"
 
                 // Wind animation
 				float4 pos = mul(_Properties[instanceID].mat, v.vertex);
+                float3 bendVector = float3(pos.x,0,pos.z) - float3(_PlayerPos.x,0,_PlayerPos.z);
+                float distFromPlayer = length(bendVector);
+                float finalBend = 2 * clamp(3 - distFromPlayer ,0, distFromPlayer);
                 
-                float posX = _Properties[instanceID].mat[0][0] * _Time * _WindFrequency;
-                float posZ = _Properties[instanceID].mat[0][2] * _Time * _WindFrequency;
+                float freq = _Time * _WindFrequency;
+                float posX = _Properties[instanceID].mat[0][0] * freq;
+                float posZ = _Properties[instanceID].mat[0][2] * freq;
                 float4 tex = tex2Dlod (_WindNoiseTexture, float4(posX,posZ,0,0));
 				pos.xz += (height * pow(2,_WindHeightFactor)) * ((tex.r+tex.g+tex.b) * _WindAmplitude);
 				pos.xz += height * sin((_Properties[instanceID].mat[0][0] + _Properties[instanceID].mat[0][2]) + _Time * _WindSinFrequency) * _WindSinAmplitude;
+                //pos.xz += bendVector * finalBend * height;
+                pos.y *= (clamp(distFromPlayer, 0, 3) / 3);
 
                 o.vertex = UnityObjectToClipPos(pos);
-                o.color = _Properties[instanceID].color;
-                UNITY_TRANSFER_FOG(o,o.vertex);
+                o.texCoord = v.texCoord;
+
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
                 // sample the texture
-                fixed4 col = i.color;
-                // apply fog
-                UNITY_APPLY_FOG(i.fogCoord, col);
+                fixed4 col = lerp(_BotColor, _TopColor, i.texCoord.y);
+                col.a = 1;
                 return col;
             }
             ENDCG
