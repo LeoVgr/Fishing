@@ -1,4 +1,20 @@
 #pragma kernel CS_ComputeGrass
 
+RWStructuredBuffer<float3> _Positions;
+uint _Resolution;
+float _Range;
+
+void SetGrassPosition(uint3 id, float3 position)
+{
+    _Positions[id.x + id.y * _Resolution] = position;
+    //if (id.x < _Resolution && id.y < _Resolution)
+    //{
+    //}
+}
+
 [numthreads(8, 8, 1)]
-void CS_ComputeGrass (uint3 id: SV_DispatchThreadID) {}
+void CS_ComputeGrass (uint3 id: SV_DispatchThreadID) 
+{
+    SetGrassPosition(id, float3(0,0,0));
+}
+
